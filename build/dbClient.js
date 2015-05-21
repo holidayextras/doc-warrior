@@ -31,7 +31,7 @@ dbClient.getLatestVersion = function(type, callback){
     } catch(e) {
       result.rules = {};
     }
-    console.log(result);
+
     callback(null, result);
   });
 
