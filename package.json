@@ -1,0 +1,29 @@
+{
+  "name": "hxTerms",
+  "version": "0.0.1",
+  "description": "Get the relevant terms from the terms and conditions database",
+  "main": "index.js",
+  "engines": {
+    "node": "0.10.29"
+  },
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha -R spec $(find build -name '*_test.js')"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/holidayextras/hxTerms.git"
+  },
+  "author": "Harley Rowland, Andrew Cashmore",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/holidayextras/terms-and-conditions/issues"
+  },
+  "homepage": "https://github.com/holidayextras/hxTerms",
+  "dependencies": {
+    "async": "^0.9.0",
+    "lodash": "^3.8.0",
+    "mysql": "^2.6.2",
+    "sinon": "^1.14.1",
+    "mocha": "^2.2.4"
+  }
+}
