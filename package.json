@@ -1,29 +1,27 @@
 {
-  "name": "hxTerms",
+  "name": "doc-warrior",
   "version": "0.0.1",
-  "description": "Get the relevant terms from the terms and conditions database",
+  "description": "Retrieve documents, with rules!",
   "main": "index.js",
-  "engines": {
-    "node": "0.10.29"
-  },
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha -R spec $(find build -name '*_test.js')"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/holidayextras/hxTerms.git"
+    "url": "https://github.com/holidayextras/doc-warrior.git"
   },
-  "author": "Harley Rowland, Andrew Cashmore",
+  "keywords": [
+    "['document'",
+    "'rules'",
+    "'doc']"
+  ],
+  "author": "Andrew Cashmore & Harley Rowland",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/holidayextras/terms-and-conditions/issues"
+    "url": "https://github.com/holidayextras/doc-warrior/issues"
   },
-  "homepage": "https://github.com/holidayextras/hxTerms",
+  "homepage": "https://github.com/holidayextras/doc-warrior",
   "dependencies": {
-    "async": "^0.9.0",
-    "lodash": "^3.8.0",
-    "mysql": "^2.6.2",
-    "sinon": "^1.14.1",
-    "mocha": "^2.2.4"
+    "require-all": "^1.1.0"
   }
 }
