@@ -4,13 +4,14 @@ var docs = new DocWarrior({
     type: 'database',
     host: 'localhost',
     port: 3306,
+    connectionLimit: 10,
     user: 'root',
     pass: '',
-    dbname: 'terms'
+    database: 'terms'
   }
 });
 
-var opts = {
+var docOpts = {
   docs: ['freeif', 'bpg'],
   params: {
     date: '2015-01-01 00:00:00',
@@ -20,6 +21,7 @@ var opts = {
   }
 };
 
-docs.get(opts, function(err, response){
+docs.get(docOpts, function(err, response){
   console.log(err, response);
+  process.exit(0);
 });

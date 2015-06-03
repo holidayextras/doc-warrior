@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/holidayextras/doc-warrior",
   "dependencies": {
+    "mysql": "^2.6.2",
     "require-all": "^1.1.0"
   }
 }
