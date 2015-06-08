@@ -11,11 +11,11 @@ var conOpts = {
   database: 'terms'
 };
 
-var docConnection = require('../lib/connectors/database.js');
-var connector = new docConnection(conOpts);
+var Connector = require('../lib/connectors/database.js');
+var connector = new Connector(conOpts);
 
 describe('Unit - database', function(){
-  describe('getDocument', function(){
+  describe('get', function(){
     var callback = null;
 
     beforeEach(function(){
