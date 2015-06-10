@@ -14,7 +14,7 @@ var docs = new DocWarrior({
 var docOpts = {
   docs: ['freeif', 'bpg'],
   params: {
-    agent: 'WEB1',
+    agent: '',
     brand: 'HX',
     channel: 'D'
   }
