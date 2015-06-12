@@ -3,15 +3,7 @@ var sinon = require('sinon');
 var async = require('async');
 
 var docOpts = {
-  connector: {
-    type: 'database',
-    host: 'localhost',
-    port: 3306,
-    connectionLimit: 10,
-    user: 'root',
-    pass: '',
-    database: 'terms'
-  }
+  connector: {type: 'database'}
 };
 
 var docConnection = require('../lib/connectors/database');
@@ -174,12 +166,10 @@ describe('Unit - docs', function(){
     var callback = null;
 
     beforeEach(function(){
-      // sinon.stub(connector, 'getDocument');
       callback = sinon.spy();
     });
 
     afterEach(function(){
-      // connector.getDocument.restore();
       callback = null;
     });
 

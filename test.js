@@ -7,20 +7,19 @@ var docs = new DocWarrior({
     connectionLimit: 10,
     user: 'root',
     pass: '',
-    database: 'terms'
+    database: 'terms',
+    table: 'terms.versions'
   }
 });
 
 var docOpts = {
   docs: ['freeif', 'bpg'],
   params: {
-    agent: '',
-    brand: 'HX',
-    channel: 'D'
+    brand: 'HX'
   }
 };
 
 docs.get(docOpts, function(err, response){
-  console.log(err, response);
+  console.log(response);
   process.exit(0);
 });
