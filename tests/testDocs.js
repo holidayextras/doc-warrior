@@ -1,6 +1,7 @@
 var assert = require('assert');
 var sinon = require('sinon');
 var async = require('async');
+var VError = require('verror');
 
 var docOpts = {
   connector: {type: 'database'}
@@ -34,44 +35,58 @@ describe('Unit - docs', function(){
       opts = null;
     });
 
-    it('should return an error if no opts are passed to get', function(){
-      docs.get(null, callback);
-      assert.equal(callback.firstCall.args[0], 'opts not passed to get');
+    describe('With bad input', function(){
+
+      it('should return an error if no opts are passed to get', function(){
+        docs.get(null, callback);
+        assert.deepEqual(callback.firstCall.args[0], new VError('opts not passed to get'));
+      });
+
+      it('should return an error if no opts.docs are passed to get', function(){
+        docs.get({}, callback);
+        assert.deepEqual(callback.firstCall.args[0], new VError('docs not passed within opts to get'));
+      });
+
     });
 
-    it('should return an error if no opts.docs are passed to get', function(){
-      docs.get({}, callback);
-      assert.equal(callback.firstCall.args[0], 'docs not passed within opts to get');
-    });
+    describe('With good input', function(){
 
-    it('async.each has been called', function(){
-      sinon.stub(async, 'each');
-      docs.get(opts, callback);
-      assert.ok(async.each.calledOnce);
-      async.each.restore();
-    });
+      var processDocStub = null;
 
-    it('should call _processDocument once for each doc in opts', function(){
-      sinon.stub(docs, '_processDocument');
-      docs.get(opts, callback);
-      assert.ok(docs._processDocument.calledThrice);
-      docs._processDocument.restore();
-    });
+      beforeEach(function(){
+        processDocStub = sinon.stub(docs, '_processDocument');
+        sinon.stub(docs, '_returnInOrder');
+      });
 
-    it('should callback with error if _processDocument callsback with error', function(){
-      sinon.stub(docs, '_processDocument').callsArgWith(3, 'An Error');
-      docs.get(opts, callback);
-      assert.ok(callback.firstCall.args[0], 'An Error');
-      docs._processDocument.restore();
-    });
+      afterEach(function(){
+        docs._processDocument.restore();
+        docs._returnInOrder.restore();
+      });
 
-    it('should call _returnInOrder if no errors', function(){
-      sinon.stub(docs, '_processDocument').callsArgWith(3, null, 'Some Content');
-      sinon.stub(docs, '_returnInOrder');
-      docs.get(opts, callback);
-      assert.ok(docs._returnInOrder.calledOnce);
-      docs._processDocument.restore();
-      docs._returnInOrder.restore();
+      it('should call async.each', function(){
+        sinon.stub(async, 'each');
+        docs.get(opts, callback);
+        assert.ok(async.each.calledOnce);
+        async.each.restore();
+      });
+
+      it('should call _processDocument once for each doc in opts', function(){
+        docs.get(opts, callback);
+        assert.ok(docs._processDocument.calledThrice);
+      });
+
+      it('should callback with error if _processDocument callsback with error', function(){
+        processDocStub.callsArgWith(3, 'An Error');
+        docs.get(opts, callback);
+        assert.ok(callback.firstCall.args[0], 'An Error');
+      });
+
+      it('should call _returnInOrder if no errors', function(){
+        processDocStub.callsArgWith(3, null, 'Some Content');
+        docs.get(opts, callback);
+        assert.ok(docs._returnInOrder.calledOnce);
+      });
+
     });
 
   });
@@ -89,7 +104,7 @@ describe('Unit - docs', function(){
 
     it('should callback an err if no docType parameter', function(){
       docs._processDocument(null, '2015-01-01 00:00:00', {}, callback);
-      assert.equal(callback.firstCall.args[0], 'No docType passed to _processDocument');
+      assert.deepEqual(callback.firstCall.args[0], new VError('No docType passed to _processDocument'));
     });
 
     it('should callback err if no rows in database table', function(){
@@ -175,7 +190,7 @@ describe('Unit - docs', function(){
 
     it('should callback an err if no docType parameter', function(){
       docs._getDocument(null, '2015-01-01 00:00:00', callback);
-      assert.equal(callback.firstCall.args[0], 'No docType passed to _getDocument');
+      assert.deepEqual(callback.firstCall.args[0], new VError('No docType passed to _getDocument'));
     });
   });
 
