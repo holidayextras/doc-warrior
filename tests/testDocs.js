@@ -61,6 +61,7 @@ describe('Unit - docs', function(){
       afterEach(function(){
         docs._processDocument.restore();
         docs._returnInOrder.restore();
+        processDocStub = null;
       });
 
       it('should call async.each', function(){
@@ -93,13 +94,19 @@ describe('Unit - docs', function(){
 
   describe('_processDocument', function(){
     var callback = null;
+    var getDocStub = null;
+    var docRulesStub = null;
 
     beforeEach(function(){
       callback = sinon.spy();
+      getDocStub = sinon.stub(docs, '_getDocument');
+      docRulesStub = sinon.stub(docs, '_runDocumentRules')
     });
 
     afterEach(function(){
       callback = null;
+      docs._getDocument.restore();
+      docs._runDocumentRules.restore();
     });
 
     it('should callback an err if no docType parameter', function(){
@@ -108,72 +115,61 @@ describe('Unit - docs', function(){
     });
 
     it('should callback err if no rows in database table', function(){
-      sinon.stub(docs, '_getDocument');
       docs._processDocument('freeif', callback);
       assert.ok(docs._getDocument.calledOnce);
-      docs._getDocument.restore();
     });
 
     it('should callback result if err returned from connector._getDocument', function(){
-      sinon.stub(docs, '_getDocument').callsArgWith(2, 'An Error');
+      getDocStub.callsArgWith(2, 'An Error');
       docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[0], 'An Error');
-      docs._getDocument.restore();
     });
 
     it('should callback content if empty rules object', function(){
-      sinon.stub(docs, '_getDocument').callsArgWith(2, null, {
+      getDocStub.callsArgWith(2, null, {
         content: "My content!",
         rules: {}
       });
       docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], 'My content!');
-      docs._getDocument.restore();
     });
 
     it('should callback content if empty rules object', function(){
-      sinon.stub(docs, '_getDocument').callsArgWith(2, null, {
+      getDocStub.callsArgWith(2, null, {
         content: "My content!",
         rules: {
           rule1: 'a',
           rule2: 'b'
         }
       });
-      sinon.stub(docs, '_runDocumentRules')
       docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
       assert.ok(docs._runDocumentRules.calledOnce);
-      docs._getDocument.restore();
-      docs._runDocumentRules.restore();
     });
 
     it('should callback content if _runDocumentRules returns true', function(){
-      sinon.stub(docs, '_getDocument').callsArgWith(2, null, {
+      getDocStub.callsArgWith(2, null, {
         content: "My content!",
         rules: {
           rule1: 'a',
           rule2: 'b'
         }
       });
-      sinon.stub(docs, '_runDocumentRules').returns(true);
+      docRulesStub.returns(true);
       docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], 'My content!');
-      docs._getDocument.restore();
-      docs._runDocumentRules.restore();
     });
 
     it('should callback empty string if _runDocumentRules returns false', function(){
-      sinon.stub(docs, '_getDocument').callsArgWith(2, null, {
+      getDocStub.callsArgWith(2, null, {
         content: "My content!",
         rules: {
           rule1: 'a',
           rule2: 'b'
         }
       });
-      sinon.stub(docs, '_runDocumentRules').returns(false);
+      docRulesStub.returns(false);
       docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], '');
-      docs._getDocument.restore();
-      docs._runDocumentRules.restore();
     });
   });
 
