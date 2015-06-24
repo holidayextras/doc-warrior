@@ -35,6 +35,9 @@ var docs = new DocWarrior({
 ```
 
 #### Request
+
+*Note: not passing in a 'date' parameter will return the latest version of the requested document. Pass in the date parameter to get a specific version*
+
 ```javascript
 var docOpts = {
   docs: ['terms-and-conditions', 'security-policy'], // These get concatenated
