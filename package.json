@@ -1,0 +1,33 @@
+{
+  "name": "doc-warrior",
+  "version": "0.0.2",
+  "description": "Retrieve documents, with rules!",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -R spec $(find tests -name '*.js')"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/holidayextras/doc-warrior.git"
+  },
+  "keywords": [
+    "document",
+    "rules",
+    "doc"
+  ],
+  "author": "Andrew Cashmore & Harley Rowland",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/holidayextras/doc-warrior/issues"
+  },
+  "homepage": "https://github.com/holidayextras/doc-warrior",
+  "dependencies": {
+    "async": "^1.2.1",
+    "mysql": "^2.6.2",
+    "verror": "^1.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "sinon": "^1.15.3"
+  }
+}
