@@ -29,14 +29,14 @@ describe('Unit - database', function(){
 
     it('should callback with err if err is thrown in database', function(){
       sinon.stub(connector, '_queryWithValues').callsArgWith(1, 'SQL error', []);
-      connector.getDocument('freeif', null, callback);
+      connector.getDocument('somedoc', null, callback);
       assert.equal(callback.firstCall.args[0], 'SQL error');
       connector._queryWithValues.restore();
     });
 
     it('should callback if no rows are found', function(){
       sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, []);
-      connector.getDocument('freeif', null, callback);
+      connector.getDocument('somedoc', null, callback);
       assert.equal(callback.firstCall.args[0], null);
       assert.equal(callback.firstCall.args[1], null);
       connector._queryWithValues.restore();
@@ -44,7 +44,7 @@ describe('Unit - database', function(){
 
     it('should callback result if rows in database', function(){
       sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, ['data']);
-      connector.getDocument('freeif', null, callback);
+      connector.getDocument('somedoc', null, callback);
       assert.equal(callback.firstCall.args[1], 'data');
       connector._queryWithValues.restore();
     });

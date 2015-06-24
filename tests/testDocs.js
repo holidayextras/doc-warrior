@@ -20,7 +20,7 @@ describe('Unit - docs', function(){
     beforeEach(function(){
       callback = sinon.spy();
       opts = {
-        docs: ['freeif', 'bpg', 'anotherTermType'],
+        docs: ['a', 'b', 'c'],
         params: {
           date: '2015-01-01 00:00:00',
           agent: 'WEB1',
@@ -115,13 +115,13 @@ describe('Unit - docs', function(){
     });
 
     it('should callback err if no rows in database table', function(){
-      docs._processDocument('freeif', callback);
+      docs._processDocument('somedoc', callback);
       assert.ok(docs._getDocument.calledOnce);
     });
 
     it('should callback result if err returned from connector._getDocument', function(){
       getDocStub.callsArgWith(2, 'An Error');
-      docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
+      docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[0], 'An Error');
     });
 
@@ -130,7 +130,7 @@ describe('Unit - docs', function(){
         content: "My content!",
         rules: {}
       });
-      docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
+      docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], 'My content!');
     });
 
@@ -142,7 +142,7 @@ describe('Unit - docs', function(){
           rule2: 'b'
         }
       });
-      docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
+      docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
       assert.ok(docs._runDocumentRules.calledOnce);
     });
 
@@ -155,7 +155,7 @@ describe('Unit - docs', function(){
         }
       });
       docRulesStub.returns(true);
-      docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
+      docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], 'My content!');
     });
 
@@ -168,7 +168,7 @@ describe('Unit - docs', function(){
         }
       });
       docRulesStub.returns(false);
-      docs._processDocument('freeif', '2015-01-01 00:00:00', {}, callback);
+      docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], '');
     });
   });
@@ -196,7 +196,7 @@ describe('Unit - docs', function(){
     });
 
     it('should return an err if no params parameter', function(){
-      assert.ok(!(docs._runDocumentRules('freeif')));
+      assert.ok(!(docs._runDocumentRules('somedoc')));
     });
 
     it('should call async each', function(){
@@ -213,18 +213,18 @@ describe('Unit - docs', function(){
     });
 
     it('should return an empty string if no docs parameter', function(){
-      assert.equal(docs._returnInOrder('freeif'), '');
+      assert.equal(docs._returnInOrder('somedoc'), '');
     });
 
     describe('should return in the correct requested order', function(){
       it('if already in the correct order', function(){
-        var mockDocs = {freeif: 'freeif content', bpg: 'bpg content'};
-        assert.equal(docs._returnInOrder([ 'freeif', 'bpg' ], mockDocs), 'freeif content\n\nbpg content\n\n');
+        var mockDocs = {somedoc: 'somedoc content', anotherdoc: 'anotherdoc content'};
+        assert.equal(docs._returnInOrder([ 'somedoc', 'anotherdoc' ], mockDocs), 'somedoc content\n\nanotherdoc content\n\n');
       });
 
       it('if not already in the correct order', function(){
-        var mockDocs = {bpg: 'bpg content', freeif: 'freeif content'};
-        assert.equal(docs._returnInOrder([ 'freeif', 'bpg' ], mockDocs), 'freeif content\n\nbpg content\n\n');
+        var mockDocs = {anotherdoc: 'anotherdoc content', somedoc: 'somedoc content'};
+        assert.equal(docs._returnInOrder([ 'somedoc', 'anotherdoc' ], mockDocs), 'somedoc content\n\nanotherdoc content\n\n');
       });
     });
   });
