@@ -1,0 +1,26 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node',
+1 verbose cli   '/Users/damian.casey/.nvm/versions/node/v0.12.9/bin/npm',
+1 verbose cli   'start' ]
+2 info using npm@3.9.5
+3 info using node@v0.12.9
+4 verbose stack Error: missing script: start
+4 verbose stack     at run (/Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/lib/run-script.js:150:19)
+4 verbose stack     at /Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/lib/run-script.js:60:5
+4 verbose stack     at /Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/read-package-json/read-json.js:356:5
+4 verbose stack     at checkBinReferences_ (/Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/read-package-json/read-json.js:320:45)
+4 verbose stack     at final (/Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/read-package-json/read-json.js:354:3)
+4 verbose stack     at then (/Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/read-package-json/read-json.js:124:5)
+4 verbose stack     at /Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/read-package-json/read-json.js:311:12
+4 verbose stack     at /Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:78:16
+4 verbose stack     at fs.js:334:14
+4 verbose stack     at /Users/damian.casey/.nvm/versions/node/v0.12.9/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:43:10
+5 verbose cwd /Users/damian.casey/work/doc-warrior
+6 error Darwin 15.6.0
+7 error argv "node" "/Users/damian.casey/.nvm/versions/node/v0.12.9/bin/npm" "start"
+8 error node v0.12.9
+9 error npm  v3.9.5
+10 error missing script: start
+11 error If you need help, you may report this error at:
+11 error     <https://github.com/npm/npm/issues>
+12 verbose exit [ 1, true ]
