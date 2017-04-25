@@ -25,7 +25,8 @@ describe('Unit - docs', function(){
           date: '2015-01-01 00:00:00',
           agent: 'WEB1',
           brand: 'HX',
-          channel: 'D'
+          channel: 'D',
+          productCode: 'Code123'
         }
       }
     });
@@ -35,7 +36,7 @@ describe('Unit - docs', function(){
       opts = null;
     });
 
-    describe('With bad input', function(){
+    context('With bad input', function(){
 
       it('should return an error if no opts are passed to get', function(){
         docs.get(null, callback);
@@ -43,25 +44,26 @@ describe('Unit - docs', function(){
       });
 
       it('should return an error if no opts.docs are passed to get', function(){
-        docs.get({}, callback);
+        docs.get({ docs: null }, callback);
         assert.deepEqual(callback.firstCall.args[0], new VError('docs not passed within opts to get'));
       });
 
     });
 
-    describe('With good input', function(){
-
+    context('With good input and subdirectories', function(){
       var processDocStub = null;
 
-      beforeEach(function(){
-        processDocStub = sinon.stub(docs, '_processDocument');
-        sinon.stub(docs, '_returnInOrder');
+      beforeEach(function() {
+        sinon.stub(docs, '_processSubdirectories').yields(['a', 'b', 'c']);
       });
 
       afterEach(function(){
-        docs._processDocument.restore();
-        docs._returnInOrder.restore();
-        processDocStub = null;
+        docs._processSubdirectories.restore();
+      });
+
+      it('should call _processSubdirectories for with the provided array', function() {
+        docs.get(opts, callback);
+        assert.ok(docs._processSubdirectories.calledWith(['a', 'b', 'c']));
       });
 
       it('should call async.each', function(){
@@ -70,26 +72,7 @@ describe('Unit - docs', function(){
         assert.ok(async.each.calledOnce);
         async.each.restore();
       });
-
-      it('should call _processDocument once for each doc in opts', function(){
-        docs.get(opts, callback);
-        assert.ok(docs._processDocument.calledThrice);
-      });
-
-      it('should callback with error if _processDocument callsback with error', function(){
-        processDocStub.callsArgWith(3, 'An Error');
-        docs.get(opts, callback);
-        assert.ok(callback.firstCall.args[0], 'An Error');
-      });
-
-      it('should call _returnInOrder if no errors', function(){
-        processDocStub.callsArgWith(3, null, 'Some Content');
-        docs.get(opts, callback);
-        assert.ok(docs._returnInOrder.calledOnce);
-      });
-
     });
-
   });
 
   describe('_processDocument', function(){
@@ -170,6 +153,51 @@ describe('Unit - docs', function(){
       docRulesStub.returns(false);
       docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
       assert.equal(callback.firstCall.args[1], '');
+    });
+  });
+
+  describe('_processSubdirectories', function() {
+    var callback = null;
+    var paragraphCheck = null;
+    var parentDirectories;
+
+    beforeEach(function() {
+      callback = sinon.spy();
+      paragraphCheck = sinon.stub(docs.connector, 'checkForParagraphs');
+      parentDirectories = ['a'];
+    });
+
+    afterEach(function(){
+      callback = null;
+      docs.connector.checkForParagraphs.restore();
+    });
+
+    context('when no parent directories are provided', function() {
+      it('should return an empty array', function(){
+        var documents = docs._processSubdirectories(null);
+        assert.deepEqual(documents, []);
+      });
+    });
+
+    context('when we have parent directories', function() {
+      it('should call async.each', function(){
+        sinon.stub(async, 'each');
+        docs._processSubdirectories(parentDirectories);
+        assert.ok(async.each.calledOnce);
+        async.each.restore();
+      });
+
+      it('should call connector.checkForParagraphs', function(){
+        docs._processSubdirectories(parentDirectories);
+        assert.ok(docs.connector.checkForParagraphs.calledOnce);
+      });
+
+      it('should return the just the sub directories for this parent if the database returns them', function(){
+        paragraphCheck.yields(null, [ { type: 'a/a_sub_document_one' }]);
+        var expected = [[ { type: 'a/a_sub_document_one' }]];
+        docs._processSubdirectories(parentDirectories, callback);
+        assert.deepEqual(callback.firstCall.args[1], expected);
+      });
     });
   });
 
