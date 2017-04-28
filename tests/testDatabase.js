@@ -50,5 +50,4 @@ describe('Unit - database', function(){
     });
 
   });
-
 });
