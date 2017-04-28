@@ -93,6 +93,19 @@ describe('Unit - docs', function(){
       assert.equal(callback.firstCall.args[1], 'My content!');
     });
 
+    it('Merges all the content that apply', function(){
+      getDocStub.callsArgWith(2, null, [{
+        content: "My content!",
+        rules: {}
+      }, {
+        content: 'My content2!',
+        rules: {}
+      }
+    ]);
+      docs._processDocument('somedoc', '2015-01-01 00:00:00', {}, callback);
+      assert.equal(callback.firstCall.args[1], 'My content!\nMy content2!');
+    });
+
     it('should callback content if empty rules object', function(){
       getDocStub.callsArgWith(2, null, [{
         content: "My content!",

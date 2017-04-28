@@ -41,11 +41,17 @@ describe('Unit - database', function(){
       assert.equal(callback.firstCall.args[1], null);
       connector._queryWithValues.restore();
     });
+    it('should remove the old format rules when there are multiple results', function() {
+      sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, ['data', 'data1', 'data2']);
+      connector.getDocument('somedoc', null, callback);
+      assert.deepEqual(callback.firstCall.args[1], ['data1', 'data2']);
+      connector._queryWithValues.restore();
+    });
 
     it('should callback result if rows in database', function(){
       sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, ['data']);
       connector.getDocument('somedoc', null, callback);
-      assert.equal(callback.firstCall.args[1], 'data');
+      assert.deepEqual(callback.firstCall.args[1], ['data']);
       connector._queryWithValues.restore();
     });
 
