@@ -42,52 +42,31 @@ describe('Unit - database', function(){
       connector._queryWithValues.restore();
     });
 
-    it('should callback result if rows in database', function(){
-      sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, ['data']);
+    it('should remove the old format rules when there are multiple results', function() {
+      var rowData = [
+        { type: 'data1' }, { type: 'data/2'}, { type: 'data/3'}
+      ];
+      var returnsWith = [
+          {
+             "rules": {},
+             "type": "data/2"
+           },
+           {
+              "rules": {},
+              "type": "data/3"
+            }
+      ]
+      sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, rowData);
       connector.getDocument('somedoc', null, callback);
-      assert.equal(callback.firstCall.args[1], 'data');
+      assert.deepEqual(callback.firstCall.args[1], returnsWith);
       connector._queryWithValues.restore();
     });
 
-  });
-
-  describe('checkForParagraphs', function() {
-    var callback = null;
-
-    beforeEach(function(){
-      callback = sinon.spy();
-    });
-
-    afterEach(function(){
-      callback = null;
-    });
-
-    context('when no doc, or an empty string is passed', function() {
-      it('should return an error with null passed in', function(){
-        connector.checkForParagraphs(null, callback);
-        assert.deepEqual(callback.firstCall.args[0], new VError('doc parameter not passed to checkForParagraphs.'));
-      });
-    });
-
-    context('when a document string is passed', function() {
-      var doc;
-      var queryWithValues = null;
-
-      beforeEach(function() {
-        doc = 'terms_and_conditions';
-        queryWithValues = sinon.stub(connector, '_queryWithValues');
-      });
-
-      it('should call _queryWithValues with the correctly formatted options', function() {
-        var expectedOptions = {
-          sql: 'SELECT type FROM ??     WHERE `type` LIKE ? ORDER BY type ASC;',
-          values: ['versions', '%terms_and_conditions%']
-        }
-        connector.checkForParagraphs(doc, callback);
-        assert.ok(connector._queryWithValues.calledWith(expectedOptions));
-        queryWithValues = null;
-      });
+    it('should callback only one row if one row is found', function() {
+      sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, ['data']);
+      connector.getDocument('somedoc', null, callback);
+      assert.deepEqual(callback.firstCall.args[1], ['data']);
+      connector._queryWithValues.restore();
     });
   });
-
 });
