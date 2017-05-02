@@ -37,7 +37,7 @@ describe('Unit - database', function(){
     it('should callback if no rows are found', function(){
       sinon.stub(connector, '_queryWithValues').callsArgWith(1, null, []);
       connector.getDocument('somedoc', null, callback);
-      assert.equal(callback.firstCall.args[0], 'No documents matching your search');
+      assert.equal(callback.firstCall.args[0], null);
       assert.equal(callback.firstCall.args[1], null);
       connector._queryWithValues.restore();
     });
