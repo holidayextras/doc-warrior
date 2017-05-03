@@ -1,6 +1,6 @@
 {
   "name": "doc-warrior",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Retrieve documents, with rules!",
   "main": "index.js",
   "scripts": {
