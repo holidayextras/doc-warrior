@@ -1,3 +1,7 @@
+# v1.0.1
+
+- Fixed bug where it errors for duplicate documents
+
 # v1.0.0
 
 - More notEquals now matches when there is nothing passed in.
