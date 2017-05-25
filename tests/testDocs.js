@@ -2,6 +2,7 @@ var assert = require('assert');
 var sinon = require('sinon');
 var async = require('async');
 var VError = require('verror');
+var ruleTypes = require('../lib/rules');
 
 var docOpts = {
   connector: {type: 'database'}
@@ -163,6 +164,21 @@ describe('Unit - docs', function(){
   });
 
   describe('_runDocumentRules', function(){
+    var rules, opts;
+
+    beforeEach(function(){
+      opts = {
+        docs: ['a', 'b', 'c'],
+        params: {
+          date: '2015-01-01 00:00:00',
+          agent: 'WEB1',
+          brand: 'HX',
+          channel: 'D',
+          productCode: 'Code123'
+        }
+      };
+    });
+
     it('should return an err if no docType parameter', function(){
       assert.ok(!(docs._runDocumentRules()));
     });
@@ -171,11 +187,161 @@ describe('Unit - docs', function(){
       assert.ok(!(docs._runDocumentRules('somedoc')));
     });
 
-    it('should call async each', function(){
-      sinon.stub(async, 'each');
-      docs._runDocumentRules({}, {});
-      assert.ok(async.each.calledOnce);
-      async.each.restore();
+    context('When there is only one rule and rule type', function() {
+      var equalsStub;
+      beforeEach(function() {
+        rules = { equals: { brand: ['HX'] } }
+        equalsStub = sinon.stub(ruleTypes, 'equals')
+      });
+
+      afterEach(function() {
+        equalsStub.restore();
+      });
+
+      it('returns true if the rule passes', function() {
+        equalsStub.returns(true);
+        assert.equal(docs._runDocumentRules(rules, opts.params), true)
+      });
+
+      it('returns false if the rule does not pass', function() {
+        equalsStub.returns(false);
+        assert.equal(docs._runDocumentRules(rules, opts.params), false)
+      });
+    });
+
+    context('When there is more than one rule of the same type', function() {
+      var equalsStub;
+      beforeEach(function() {
+        rules = { equals: { brand: ['HX'], productCode: [ 'LHU3'] } };
+        equalsStub = sinon.stub(ruleTypes, 'equals');
+      });
+
+      afterEach(function() {
+        equalsStub.restore();
+      });
+
+      it('returns true if all rules pass', function() {
+        equalsStub.onFirstCall().returns(true).onSecondCall().returns(true);
+        assert.equal(docs._runDocumentRules(rules, opts.params), true);
+      });
+
+      it('returns false if the rule does not pass', function() {
+        equalsStub.returns(false);
+        assert.equal(docs._runDocumentRules(rules, opts.params), false);
+      });
+
+      it('returns false if the any rule does not pass', function() {
+        equalsStub.onFirstCall().returns(false).onSecondCall().returns(true);
+        assert.equal(docs._runDocumentRules(rules, opts.params), false);
+      });
+    });
+
+    context('When passed an invalid rule', function() {
+      context('When the ruleType does not exist', function() {
+        beforeEach(function () {
+          rules = {
+            notArule: { brand: ['HX'], productCode: [ 'LHU3'] }
+          };
+        })
+
+        it('ignores the rule by returning true', function() {
+          assert.equal(docs._runDocumentRules(rules, opts.params), true);
+        });
+
+        context('When a mix of invalid rule type and an actual rule', function() {
+          var equalsStub;
+          beforeEach(function() {
+            rules.equals = { brand: ['HX'], productCode: [ 'LHU3'] };
+            equalsStub = sinon.stub(ruleTypes, 'equals');
+            equalsStub.returns(false);
+          });
+
+          afterEach(function() {
+            equalsStub.restore();
+          });
+
+          it('evaluates the second rule and ignores the first', function() {
+            assert.equal(docs._runDocumentRules(rules, opts.params), false);
+          });
+        });
+      });
+
+      context('When the rule params is invalid', function() {
+        var equalsStub;
+        beforeEach(function() {
+          equalsStub = sinon.stub(ruleTypes, 'equals');
+        });
+
+        afterEach(function() {
+          equalsStub.restore();
+        });
+
+        context('When the only param is invalid', function() {
+          beforeEach(function() {
+            rules = { equals: { brandy: ['HX'] } };
+          });
+
+          it('evaluates as false', function() {
+            assert.equal(docs._runDocumentRules(rules, opts.params), false);
+          });
+        });
+
+        context('When there is one valid and one invalid param', function() {
+          beforeEach(function() {
+            rules = { equals: { brandy: ['HX'], productCode: [ 'LHU3'] } };
+            equalsStub.returns(true);
+          });
+
+          it('evaluates as false even if the other one is valid', function() {
+            assert.equal(docs._runDocumentRules(rules, opts.params), false);
+          });
+
+          it('only calls the comparator on the valid params', function() {
+            docs._runDocumentRules(rules, opts.params);
+            assert(equalsStub.calledOnce);
+          });
+        });
+      });
+    })
+    context('When there is more than one rule of different type', function() {
+      var equalsStub, notEqualStub;
+      beforeEach(function() {
+        rules = {
+          equals: { brand: ['HX'], productCode: [ 'LHU3'] },
+          notEqual: { brand: ['CC'], channel: ['D'] }
+        }
+        equalsStub = sinon.stub(ruleTypes, 'equals');
+        notEqualStub = sinon.stub(ruleTypes, 'notEqual');
+      });
+
+      afterEach(function() {
+        equalsStub.restore();
+        notEqualStub.restore();
+      });
+
+      it('returns true if all rules pass', function() {
+        equalsStub.returns(true);
+        notEqualStub.returns(true);
+        assert.equal(docs._runDocumentRules(rules, opts.params), true)
+      });
+
+      it('returns false if all the rules do not pass', function() {
+        equalsStub.returns(false);
+        notEqualStub.returns(false);
+        assert.equal(docs._runDocumentRules(rules, opts.params), false)
+      });
+
+      it('returns false if any of the the rules do not pass', function() {
+        equalsStub.onFirstCall().returns(true).onSecondCall().returns(true);
+        equalsStub.onFirstCall().returns(true).onSecondCall().returns(false);
+        assert.equal(docs._runDocumentRules(rules, opts.params), false)
+      });
+
+      it('returns false if any rules do not pass even cross type', function() {
+        equalsStub.onFirstCall().returns(false).onSecondCall().returns(true);
+        equalsStub.onFirstCall().returns(true).onSecondCall().returns(true);
+        assert.equal(docs._runDocumentRules(rules, opts.params), false)
+      });
     });
   });
 
