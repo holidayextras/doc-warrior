@@ -1,3 +1,6 @@
+# v1.0.2
+- Fixed bug where conflicting rules returned inconsistently
+
 # v1.0.1
 
 - Fixed bug where it errors for duplicate documents
