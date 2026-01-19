@@ -23,7 +23,7 @@
   "homepage": "https://github.com/holidayextras/doc-warrior",
   "dependencies": {
     "async": "^1.2.1",
-    "mysql": "^2.6.2",
+    "mysql2": "3.15.0",
     "verror": "^1.6.0"
   },
   "devDependencies": {
